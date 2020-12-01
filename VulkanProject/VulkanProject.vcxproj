@@ -88,6 +88,14 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\compile.bat" />
+    <None Include="res\frag.spv" />
+    <None Include="res\object.csv" />
+    <None Include="res\shader.frag" />
+    <None Include="res\shader.vert" />
+    <None Include="res\vert.spv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

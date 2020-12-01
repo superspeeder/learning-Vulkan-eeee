@@ -19,4 +19,14 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\frag.spv" />
+    <None Include="res\vert.spv" />
+    <None Include="res\shader.frag" />
+    <None Include="res\shader.vert" />
+    <None Include="res\compile.bat">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="res\object.csv" />
+  </ItemGroup>
 </Project>
