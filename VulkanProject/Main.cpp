@@ -189,37 +189,37 @@ std::cout << "\n";
 
 
     void cleanupSwapChain() {
-        std::cout << "Cleaning Up SwapChain + dependencies\n";
+        std::cout << "Cleaning Up SwapChain + dependencies (Tasks 0->6)\n";
 
         int i = 0;
         for (auto framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
-            std::cout << "Destroyed Framebuffer " << i << "\n";
+            std::cout << "(0." << i << "/6)Destroyed Framebuffer " << i << "\n";
             i++;
 
         }
 
         vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
-        std::cout << "Freed " << commandBuffers.size() << " Command Buffers\n";
+        std::cout << "(1/6) Freed " << commandBuffers.size() << " Command Buffers\n";
 
         vkDestroyPipeline(device, graphicsPipeline, nullptr);
-        std::cout << "Destroyed Graphics Pipeline\n";
+        std::cout << "(2/6) Destroyed Graphics Pipeline\n";
 
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-        std::cout << "Destroyed Pipeline Layout\n";
+        std::cout << "(3/6) Destroyed Pipeline Layout\n";
 
         vkDestroyRenderPass(device, renderPass, nullptr);
-        std::cout << "Destroyed Render Pass\n";
+        std::cout << "(4/6) Destroyed Render Pass\n";
 
         i = 0;
         for (auto imageView : swapChainImageViews) {
             vkDestroyImageView(device, imageView, nullptr);
-            std::cout << "Destroyed Image View " << i << "\n";
+            std::cout << "(5." << i << "/6) Destroyed Image View " << i << "\n";
             i++;
         }
 
         vkDestroySwapchainKHR(device, swapChain, nullptr);
-        std::cout << "Destroyed Swapshain\n";
+        std::cout << "(6/6) Destroyed Swapshain\n";
     }
 
 
@@ -339,14 +339,16 @@ std::cout << "\n";
         std::cout << "Available Instance Layers (" << layerCount << "):\n";
 
         std::vector<VkLayerProperties> availableLayers(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
         for (VkLayerProperties prop : availableLayers) {
             std::cout << "\t" << prop.layerName << ":\n";
             std::cout << "\t\tSpecification Version: " << prop.specVersion << "\n";
             std::cout << "\t\tImplementation Verison: " << prop.implementationVersion << "\n";
-            std::cout << "\t\tDescription: " << prop.description << "\n" ;
+            std::cout << "\t\tDescription: " << prop.description << "\n";
         }
 
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
         for (const char* layerName : validationLayers) {
             std::cout << "Checking For Layer: " << layerName << '\n';
             bool layerFound = false;
@@ -372,17 +374,6 @@ std::cout << "\n";
         return false;
     }
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-        VkDebugUtilsMessageTypeFlagsEXT messageType,
-        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-        void* pUserData) {
-
-        std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
-
-
-        return VK_FALSE;
-    }
 
 
     // Physical Device
@@ -1193,7 +1184,7 @@ std::cout << "\n";
 
         std::cout << "Command Buffer Allocation\n";
         std::cout << "\tLevel: Primary\n";
-        std::cout << "\tCount: " << commandBuffers.size(); << "\n";
+        std::cout << "\tCount: " << commandBuffers.size() << "\n";
 
         if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");
@@ -1275,7 +1266,7 @@ std::cout << "\n";
 
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
-            std::cout << "Created Sema\n";
+            std::cout << "Created Sync Objects for Frame " << i << "\n";
 
         }
     }
@@ -1356,38 +1347,58 @@ std::cout << "\n";
     // Mainloop
 
     void mainLoop() {
+        std::cout << "Starting Mainloop\n";
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             drawFrame();
         }
+        std::cout << "Mainloop Finished. Waiting for devices to be idle\n";
 
         vkDeviceWaitIdle(device);
+        std::cout << "Devices are idle.\n";
     }
 
     // Cleanup
     void cleanup() {
+        std::cout << "Beginning Cleanup (Tasks 0-14)\n";
+
         cleanupSwapChain();
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
+            std::cout << "(7." << i << ") Destroyed Sync Objects " << i << "\n";
+
         }
 
         vkDestroyCommandPool(device, commandPool, nullptr);
+        std::cout << "(8/14) Destroyed Command Pool\n";
 
         vkDestroyDevice(device, nullptr);
+        std::cout << "(9/14) Destroyed Logical Device\n";
+
 
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+            std::cout << "(10/14) Destroyed Debug Messenger\n";
+        }
+        else {
+            std::cout << "(10/14) Skipping\n";
+
         }
 
         vkDestroySurfaceKHR(instance, surface, nullptr);
+        std::cout << "(11/14) Destroyed Surface\n";
+
         vkDestroyInstance(instance, nullptr);
+        std::cout << "(12/14) Destroyed Instance\n";
 
         glfwDestroyWindow(window);
+        std::cout << "(13/14) Destroyed Window\n";
 
         glfwTerminate();
+        std::cout << "(14/14) Terminated GLFW\n";
     }
 };
 
